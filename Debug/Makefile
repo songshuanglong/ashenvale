@@ -36,7 +36,7 @@ DISTNAME      = ashenvale1.0.0
 DISTDIR = /home/shuanglong/workspace/ashenvale/Debug/.tmp/ashenvale1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS)  
+LIBS          = $(SUBLIBS) -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -54,26 +54,26 @@ SOURCES       = ../main.cpp \
 		../src/as_object.cpp \
 		../src/as_poll.cpp \
 		../src/as_pollevent.cpp \
-		../src/as_pollthread.cpp \
 		../src/as_server.cpp \
 		../src/as_socket.cpp \
 		../src/as_tcpclient.cpp \
 		../src/as_tcpserver.cpp \
 		../src/as_tcpsocket.cpp \
-		../src/as_thread.cpp 
+		../src/as_thread.cpp \
+		../src/as_innerthread.cpp 
 OBJECTS       = main.o \
 		as_condition.o \
 		as_mutex.o \
 		as_object.o \
 		as_poll.o \
 		as_pollevent.o \
-		as_pollthread.o \
 		as_server.o \
 		as_socket.o \
 		as_tcpclient.o \
 		as_tcpserver.o \
 		as_tcpsocket.o \
-		as_thread.o
+		as_thread.o \
+		as_innerthread.o
 DIST          = /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/common/unix.conf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/common/linux.conf \
@@ -209,6 +209,7 @@ DIST          = /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_post.prf \
+		../.qmake.stash \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/default_pre.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/resolve_config.prf \
@@ -226,25 +227,25 @@ DIST          = /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_pre.prf \
 		include/as_object.h \
 		include/as_poll.h \
 		include/as_pollevent.h \
-		include/as_pollthread.h \
 		include/as_server.h \
 		include/as_socket.h \
 		include/as_tcpclient.h \
 		include/as_tcpserver.h \
 		include/as_tcpsocket.h \
-		include/as_thread.h ../main.cpp \
+		include/as_thread.h \
+		include/as_innerthread.h ../main.cpp \
 		../src/as_condition.cpp \
 		../src/as_mutex.cpp \
 		../src/as_object.cpp \
 		../src/as_poll.cpp \
 		../src/as_pollevent.cpp \
-		../src/as_pollthread.cpp \
 		../src/as_server.cpp \
 		../src/as_socket.cpp \
 		../src/as_tcpclient.cpp \
 		../src/as_tcpserver.cpp \
 		../src/as_tcpsocket.cpp \
-		../src/as_thread.cpp
+		../src/as_thread.cpp \
+		../src/as_innerthread.cpp
 QMAKE_TARGET  = ashenvale
 DESTDIR       = 
 TARGET        = ashenvale
@@ -391,6 +392,7 @@ Makefile: ../ashenvale.pro /opt/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++/qmake.conf 
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/qt_config.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++/qmake.conf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_post.prf \
+		.qmake.stash \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/exclusive_builds.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/default_pre.prf \
 		/opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/resolve_config.prf \
@@ -539,6 +541,7 @@ Makefile: ../ashenvale.pro /opt/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++/qmake.conf 
 /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/qt_config.prf:
 /opt/Qt5.7.0/5.7/gcc_64/mkspecs/linux-g++/qmake.conf:
 /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/spec_post.prf:
+.qmake.stash:
 /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/exclusive_builds.prf:
 /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/default_pre.prf:
 /opt/Qt5.7.0/5.7/gcc_64/mkspecs/features/resolve_config.prf:
@@ -594,44 +597,59 @@ compiler_clean:
 
 ####### Compile
 
-main.o: ../main.cpp 
+main.o: ../main.cpp ../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../main.cpp
 
-as_condition.o: ../src/as_condition.cpp 
+as_condition.o: ../src/as_condition.cpp ../include/as_condition.h \
+		../include/as_mutex.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_condition.o ../src/as_condition.cpp
 
-as_mutex.o: ../src/as_mutex.cpp 
+as_mutex.o: ../src/as_mutex.cpp ../include/as_mutex.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_mutex.o ../src/as_mutex.cpp
 
-as_object.o: ../src/as_object.cpp 
+as_object.o: ../src/as_object.cpp ../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_object.o ../src/as_object.cpp
 
-as_poll.o: ../src/as_poll.cpp 
+as_poll.o: ../src/as_poll.cpp ../include/as_poll.h \
+		../include/as_object.h \
+		../include/as_pollevent.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_poll.o ../src/as_poll.cpp
 
-as_pollevent.o: ../src/as_pollevent.cpp 
+as_pollevent.o: ../src/as_pollevent.cpp ../include/as_pollevent.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_pollevent.o ../src/as_pollevent.cpp
-
-as_pollthread.o: ../src/as_pollthread.cpp 
-	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_pollthread.o ../src/as_pollthread.cpp
 
 as_server.o: ../src/as_server.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_server.o ../src/as_server.cpp
 
-as_socket.o: ../src/as_socket.cpp 
+as_socket.o: ../src/as_socket.cpp ../include/as_socket.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_socket.o ../src/as_socket.cpp
 
-as_tcpclient.o: ../src/as_tcpclient.cpp 
+as_tcpclient.o: ../src/as_tcpclient.cpp ../include/as_tcpclient.h \
+		../include/as_tcpsocket.h \
+		../include/as_socket.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_tcpclient.o ../src/as_tcpclient.cpp
 
 as_tcpserver.o: ../src/as_tcpserver.cpp 
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_tcpserver.o ../src/as_tcpserver.cpp
 
-as_tcpsocket.o: ../src/as_tcpsocket.cpp 
+as_tcpsocket.o: ../src/as_tcpsocket.cpp ../include/as_tcpsocket.h \
+		../include/as_socket.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_tcpsocket.o ../src/as_tcpsocket.cpp
 
-as_thread.o: ../src/as_thread.cpp 
+as_thread.o: ../src/as_thread.cpp ../include/as_thread.h \
+		../include/as_object.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_thread.o ../src/as_thread.cpp
+
+as_innerthread.o: ../src/as_innerthread.cpp ../include/as_innerthread.h \
+		../include/as_thread.h \
+		../include/as_object.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o as_innerthread.o ../src/as_innerthread.cpp
 
 ####### Install
 

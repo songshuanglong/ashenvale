@@ -1,9 +1,10 @@
-#include <iostream>
-
-using namespace std;
+#include "include/as_object.h"
 
 int main(int argc, char *argv[])
 {
-    cout << "Hello World!" << endl;
+    AS::ASObject f;
+
+    new AS::ASObject(&f);
+    new AS::ASObject(&f);
     return 0;
 }

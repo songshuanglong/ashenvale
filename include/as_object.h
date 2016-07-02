@@ -12,15 +12,23 @@
 
 BEGINNAMESPACEASHENVALE
 
-class ASNoCopyStructure;
+class ASNoCopyStructure
+{
+public:
+    ASNoCopyStructure();
+    ~ASNoCopyStructure();
+
+private:
+    ASNoCopyStructure(const ASNoCopyStructure &);
+};
 
 class ASObject : public ASNoCopyStructure
 {
 public:
-    ASObject(ASObject *parent);
+    ASObject(ASObject *parent = 0);
     virtual ~ASObject();
 
-    ASObject *getParent() const;
+    ASObject *getParent();
     void setParent(ASObject *parent);
 
 private:
@@ -31,14 +39,6 @@ private:
 private:
     ASObject *_parent;
     std::vector<ASObject *> _children;
-};
-
-class ASNoCopyStructure
-{
-public:
-    ASNoCopyStructure();
-private:
-    ASNoCopyStructure(const ASNoCopyStructure &);
 };
 
 ENDNAMESPACEASHENVALE
